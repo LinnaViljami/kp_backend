@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.*
 import com.kp_backend.repository.UserController
 import io.ktor.jackson.*
 import io.ktor.features.*
+import kotlinx.coroutines.time.delay
+import java.time.Duration
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -22,7 +24,9 @@ fun Application.module(testing: Boolean = false) {
     }
     DatabaseFactory.init()
     val userController = UserController()
-
+    intercept(ApplicationCallPipeline.Features) {
+        delay(Duration.ofSeconds(1L))
+    }
     routing {
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
@@ -30,7 +34,8 @@ fun Application.module(testing: Boolean = false) {
 
 
         get("/users") {
-            call.respond(userController.getAll())
+
+            call.respond(userController.getAll());
         }
     }
 }
