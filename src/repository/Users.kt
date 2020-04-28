@@ -3,8 +3,7 @@ package com.kp_backend.repository
 import org.jetbrains.exposed.sql.Table
 
 object Users: Table() {
-    val id = uuid("id").primaryKey()
-    val firstname = text("firstname")
-    val lastname = text("lastname")
-    val age = integer("age")
+    val id = integer("id").primaryKey()
+    val email = text("email")
+    val password_hash = text("password_hash")
 }
