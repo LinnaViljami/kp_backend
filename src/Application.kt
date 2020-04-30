@@ -35,7 +35,9 @@ fun Application.module(testing: Boolean = false) {
         delay(Duration.ofSeconds(1L))
     }
 
-    val simpleJwt = SimpleJWT("my-super-secret-for-jwt")
+    val simpleJwt = SimpleJWT(System.getenv("SECRET_KEY"))
+
+
     install(Authentication) {
         jwt {
             verifier(simpleJwt.verifier)
@@ -43,6 +45,21 @@ fun Application.module(testing: Boolean = false) {
                 UserIdPrincipal(it.payload.getClaim("name").asString())
             }
         }
+
+
+
+
+    }
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.Authorization)
+        allowCredentials = true
+        anyHost()
     }
 
 
@@ -63,12 +80,10 @@ fun Application.module(testing: Boolean = false) {
             post {
 
                 val post: LoginRegister = call.receive<LoginRegister>()
-                println(post.toString())
+                val loginRegister: LoginRegister = LoginRegister(post.name, post.password)
                 val user = userController.getLoginData(post)
                 if(null != user){
-                    println("was not null")
-                    println(user.toString())
-                    call.respond(user)
+                    call.respond(mapOf("token" to simpleJwt.sign(user.email)))
                 }
                 else {
                     println("redirect")
